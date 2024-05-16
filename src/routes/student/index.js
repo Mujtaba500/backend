@@ -6,8 +6,11 @@ const studentRouter = Router();
 //GET ALL STUDENTS
 studentRouter.get("/students", studentController.getAll);
 
+//GET STUDENTS BY NAME
+studentRouter.get("/students/:name", studentController.getStudentsByName);
+
 //GET SINGLE STUDENT
-studentRouter.get("/student/:id", studentController.getStudent);
+studentRouter.get("/student/:id", studentController.getStudentById);
 
 //CREATE STUDENT
 studentRouter.post("/students", studentController.create);

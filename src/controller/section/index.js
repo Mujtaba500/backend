@@ -1,21 +1,10 @@
-const classes = [
-  {
-    name: "MERN",
-    duration: "3 hours",
-  },
-  {
-    name: "Fundamentals",
-    duration: "2 hours",
-  },
-  {
-    name: "Soft skills",
-    duration: "2 hours",
-  },
-];
+import classModel from "../../model/section/index.js";
 
 const classController = {
-  getAll: (req, res) => {
+  getAll: async (req, res) => {
     try {
+      const classes = await classModel.findAll();
+      console.log(classes);
       res.json(classes);
     } catch (err) {
       res.status(500).json({
@@ -23,18 +12,20 @@ const classController = {
       });
     }
   },
-  getClass: (req, res) => {
+  getClassByName: async (req, res) => {
     try {
       const name = req.params.name;
-      console.log(name);
-      const indexOfClass = classes.findIndex((Class) => Class.name == name);
-      if (indexOfClass == -1) {
+      const classes = await classModel.findAll({
+        where: {
+          name: name,
+        },
+      });
+      if (classes.length == 0) {
         res.status(404).json({
-          message: "No class exists with this name",
+          message: "Class with this name doesnot exist",
         });
       } else {
-        const classRequested = classes[indexOfClass];
-        res.json(classRequested);
+        res.json(classes);
       }
     } catch (err) {
       res.status(500).json({
@@ -42,12 +33,16 @@ const classController = {
       });
     }
   },
-  create: (req, res) => {
+  create: async (req, res) => {
     try {
       const payload = req.body;
-      classes.push(payload);
+      const Class = await classModel.create({
+        name: payload.name,
+        duration: payload.duration,
+      });
       res.json({
-        message: "class created",
+        message: "Class created",
+        Class,
       });
     } catch (err) {
       res.status(500).json({
@@ -55,46 +50,51 @@ const classController = {
       });
     }
   },
-  update: (req, res) => {
+  update: async (req, res) => {
     try {
-      const payload = req.body;
-      const nameOfClassToUpdate = req.params.name;
-      console.log(payload);
-      const { name, duration } = payload;
-      const indexOfClass = classes.findIndex(
-        (Class) => Class.name == nameOfClassToUpdate
-      );
-      console.log(indexOfClass);
-      if (indexOfClass == -1) {
-        res.status(404).json({
-          message: "No class exists with this name",
-        });
-      }
-      if (name) {
-        classes[indexOfClass].name = name;
-      }
-      if (duration) {
-        classes[indexOfClass].duration = duration;
-      }
-      res.json({
-        message: "Class Updated",
+      const { name, duration } = req.body;
+      const nametoUpdate = req.params.name;
+      const classToUpdate = await classModel.findOne({
+        where: {
+          name: nametoUpdate,
+        },
       });
-    } catch (err) {
-      res.status(500).json({
-        message: "Internal server error",
-      });
-    }
-  },
-  delete: (req, res) => {
-    try {
-      const name = req.params.name;
-      const indexOfClass = classes.findIndex((Class) => Class.name == name);
-      if (indexOfClass == -1) {
+      if (!classToUpdate) {
         res.status(404).json({
-          message: "No class exists with this name",
+          message: "Student to be updated not found",
         });
       } else {
-        classes.splice(indexOfClass, 1);
+        if (name) {
+          classToUpdate.name = name;
+        }
+        if (duration) {
+          classToUpdate.duration = duration;
+        }
+        await classToUpdate.save();
+        res.json({
+          message: "Class updated",
+        });
+      }
+    } catch (err) {
+      res.status(500).json({
+        message: "Internal server error",
+      });
+    }
+  },
+  delete: async (req, res) => {
+    try {
+      const id = req.params.id;
+      const classToDelete = await classModel.findByPk(id);
+      if (!classToDelete) {
+        res.status(404).json({
+          message: "Class to be deleted does not exist",
+        });
+      } else {
+        await classModel.destroy({
+          where: {
+            id: id,
+          },
+        });
         res.json({
           message: "Class deleted successfully",
         });

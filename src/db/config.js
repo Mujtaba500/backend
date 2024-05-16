@@ -3,12 +3,13 @@ import { Sequelize } from "sequelize";
 const dbName = process.env.DB_NAME;
 const dbUsername = process.env.DB_USERNAME;
 const dbPassword = process.env.DB_PASSWORD;
-const dbLocalhost = process.env.DB_HOST;
+const dbhost = process.env.DB_HOST;
 
 // Option 3: Passing parameters separately (other dialects)
 const sequelize = new Sequelize(dbName, dbUsername, dbPassword, {
-  host: dbLocalhost,
+  host: dbhost,
   dialect: "postgres",
+  logging: console.log,
 });
 
 const connectDb = async () => {

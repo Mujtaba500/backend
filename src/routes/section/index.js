@@ -7,7 +7,7 @@ const classRouter = Router();
 classRouter.get("/classes", classController.getAll);
 
 //GET SINGLE CLASS
-classRouter.get("/class/:name", classController.getClass);
+classRouter.get("/class/:name", classController.getClassByName);
 
 //CREATE CLASS
 classRouter.post("/classes", classController.create);
@@ -16,6 +16,6 @@ classRouter.post("/classes", classController.create);
 classRouter.put("/class/:name", classController.update);
 
 //DELETE CLASS
-classRouter.delete("/class/:name", classController.delete);
+classRouter.delete("/class/:id", classController.delete);
 
 export default classRouter;
